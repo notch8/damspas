@@ -72,6 +72,7 @@ ActiveRecord::Schema.define(version: 20181023231429) do
   add_index "users", ["provider", "uid"], name: "index_users_on_provider_and_uid", unique: true, using: :btree
 
   create_table "work_authorizations", force: :cascade do |t|
+    t.string   "work_pid"
     t.string   "work_title"
     t.integer  "user_id"
     t.datetime "created_at", null: false

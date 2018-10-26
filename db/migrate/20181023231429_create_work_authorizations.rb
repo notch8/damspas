@@ -1,6 +1,7 @@
 class CreateWorkAuthorizations < ActiveRecord::Migration
   def change
     create_table :work_authorizations do |t|
+      t.string :work_pid
       t.string :work_title
       t.references :user
 

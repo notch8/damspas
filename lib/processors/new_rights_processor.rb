@@ -7,7 +7,8 @@ module Processors
     def process
       puts 'begin task'
       email = @request_attributes[:email]
-      work_title = @request_attributes[:work_title]
+      work_pid = @request_attributes[:work_pid]
+      work_title = DamsObject.where(pid: work_pid).first.titleValue
       if email.present? # User.email defaults to blank string; won't create a user with a blank email
         @user = User.where(email: email).first_or_initialize do |user| # only hits the do on initialize
           user.provider = 'auth_link'
@@ -17,7 +18,7 @@ module Processors
         end
         if @user.valid?
           @user.save!
-          if @user.work_authorizations.create(work_title: work_title) && @user.valid?
+          if @user.work_authorizations.create(work_pid: work_pid, work_title: work_title) && @user.valid?
             puts 'work authorized'
           else
             puts 'work authorization failed'

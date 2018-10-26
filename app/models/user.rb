@@ -86,6 +86,7 @@ class User < ActiveRecord::Base
     if ldap != nil && ldap.kind_of?(Array)
       @group_list.concat( ldap )
     end
+    @group_list = ['shibboleth-authenticated']
     @group_list
   end
   def groups=(g)

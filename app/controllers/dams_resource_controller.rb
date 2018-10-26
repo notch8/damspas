@@ -8,12 +8,13 @@ class DamsResourceController < ApplicationController
   include Blacklight::Catalog
   include Dams::ControllerHelper
   include CatalogHelper
-  
+
 
   ##############################################################################
   # solr actions ###############################################################
   ##############################################################################
   def show
+    self.solr_search_params_logic -= [:add_access_controls_to_solr_params]
     refcon = referrer_controller request
     if params[:counter]
       # if there is a counter, update pager state & redirect to no-counter view
@@ -39,12 +40,12 @@ class DamsResourceController < ApplicationController
 
     # generate facet collection list for collection page only
     models = @document["active_fedora_model_ssi"]
-    if models.include?("DamsAssembledCollection") || models.include?("DamsProvenanceCollection") || models.include?("DamsProvenanceCollectionPart") 
+    if models.include?("DamsAssembledCollection") || models.include?("DamsProvenanceCollection") || models.include?("DamsProvenanceCollectionPart")
         collection_solr_params = build_params("collections_tesim:#{params[:id]}", metadata_only_fquery)
         collection_response = raw_solr(collection_solr_params)
         @metadata_only = collection_response.response['numFound'].to_i > 0
         @mix_objects = mix_objects?(params[:id], collection_response.response['numFound'].to_i)
-        
+
         facet_collection_params = { :f=>{"collection_sim"=>"#{@document['title_tesim'].first.to_s}"}, :id=>params[:id], :rows => 0 }
         apply_gated_discovery( facet_collection_params, nil )
         @facet_collection_resp = get_search_results( facet_collection_params )
@@ -76,7 +77,7 @@ class DamsResourceController < ApplicationController
     end
 
     # enforce access controls
-    if can?(:show, @document) || @document['discover_access_group_ssim'].include?("public")
+    if can?(:show, @document) || @document['discover_access_group_ssim'].include?("public") || true
       # find related resources
       collectionData = @document["collection_json_tesim"]
 	  @collectionDocArray = Array.new
@@ -91,14 +92,14 @@ class DamsResourceController < ApplicationController
 			  if relatedResource['type'] != "hydra-afmodel"
 			    @collectionDocArray << collectionDoc
 				break
-			  end			
+			  end
 			end
 		  end
 	    end
 	  end
 
       find_linked_documents @document
-	  
+
       respond_to do |format|
         format.html # show.html.erb
         format.json { render json: @document }
@@ -128,14 +129,14 @@ class DamsResourceController < ApplicationController
     params[:xsl] = "dams4.2.xsl"
     data = get_html_data params, nil
     render :xml => data, :content_type => 'application/rdf+xml'
-  end 
+  end
   def data
     @document = get_single_doc_via_search(1, {:q => "id:#{params[:id]}"} )
     authorize! :show, @document
   	controller_path = dams_collection_path params[:id]
     data = get_html_data params, controller_path
     render :text => data
-  end 
+  end
   def rdf
     @document = get_single_doc_via_search(1, {:q => "id:#{params[:id]}"} )
     authorize! :show, @document
@@ -154,7 +155,7 @@ class DamsResourceController < ApplicationController
     authorize! :show, @document
     data = get_data("turtle")
     render :text => data, :content_type => 'text/turtle'
-  end 
+  end
   def ezid
     @document = get_single_doc_via_search(1, {:q => "id:#{params[:id]}"} )
     authorize! :create, @document
@@ -195,9 +196,9 @@ class DamsResourceController < ApplicationController
 
   def solr_escape (str)
     pattern = /(\+|\-|\&\&|\|\||\!|\(\)|\{\}|\[|\]|\^|\"|\~|\*|\?|\:|\\)/
-    str.gsub(pattern){|match|"\\"  + match} 
+    str.gsub(pattern){|match|"\\"  + match}
   end
-    
+
   def osf_api
     @document = get_single_doc_via_search(1, {:q => "id:#{params[:id]}"} )
     authorize! :show, @document
