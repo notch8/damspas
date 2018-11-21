@@ -81,7 +81,7 @@ module Processors
       end
 
       def expire_request(work_id)
-        Aeon::Request.find(work_pid).set_to_expired
+        Aeon::Request.find(work_id).set_to_expired
       end
   end
 end
