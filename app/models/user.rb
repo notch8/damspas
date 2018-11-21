@@ -137,8 +137,9 @@ class User < ActiveRecord::Base
   end
 
   def ensure_authentication_token
-    return nil unless authentication_token.blank?
-    self.authentication_token = generate_authentication_token
+    if authentication_token.blank? # rubocop:disable GuardClause, IfUnlessModifier
+      self.authentication_token = generate_authentication_token
+    end
   end
 
   private

@@ -28,7 +28,7 @@ def create_auth_link_user
   user_attributes = {
     email: 'test@example.com',
     provider: 'auth_link',
-    uid: SecureRandom::uuid,
+    uid: SecureRandom.uuid,
   }
   user = User.new(user_attributes)
   user.ensure_authentication_token
