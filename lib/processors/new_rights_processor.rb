@@ -63,7 +63,9 @@ module Processors
 
       def create_work_authorization
         return unless work_authorization.valid?
-        work_authorization.touch # for updated authorizations
+        # touch to get the updated authorizations
+        # disable rubocop because we run validations before calling .touch
+        work_authorization.touch # rubocop:disable SkipsModelValidations
         new_list = work_obj.read_users + [user.user_key]
         work_obj.read_users = new_list.uniq
         work_obj.save
