@@ -13,9 +13,6 @@ class Aeon::RequestsController < ApplicationController
     request = Aeon::Request.new.tap{|r| r.id = params[:id]}
     updated_request = request.get_from_server
 
-    ## DEV
-    updated_request[:subLocation] = 'xx77777777'
-
     updated_request.set_to_processing
     Processors::NewRightsProcessor.new(updated_request).process
     updated_request.set_to_active
