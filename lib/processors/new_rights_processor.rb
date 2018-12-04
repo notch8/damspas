@@ -34,7 +34,7 @@ module Processors
       create_work_authorization
       activate_request(@request_attributes.id)
       send_email
-    rescue Error => e
+    rescue => e
       work_authorization.update_error "Unable to Authorize Request"
       raise e 
     end
@@ -43,7 +43,7 @@ module Processors
       return unless user && work_obj
       delete_work_authorization
       expire_request(@request_attributes.id)
-    rescue Error => e
+    rescue => e
       work_authorization.update_error "Unable to Revoke Request"
       raise e
    end
